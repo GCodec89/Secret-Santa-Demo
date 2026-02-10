@@ -14,6 +14,7 @@ class Event(db.Model):
     name = db.Column(db.String(120), nullable=False)
     year = db.Column(db.Integer, nullable=False)
     is_finished = db.Column(db.Boolean, default=False, nullable=False)
+    connected = db.Column(db.Boolean, default=False, nullable=False)
 
     participants = db.relationship(
         "User",

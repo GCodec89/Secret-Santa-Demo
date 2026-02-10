@@ -234,11 +234,14 @@ def draw_event(event_id):
         flash("Not enough participants to perform draw.", "danger")
         return redirect(url_for("admin.events"))
 
+    if not event.connected:
+        flash("Please run connect() first", "warning")
+        return redirect(url_for("admin.events"))
+
     try:
         assign_secret_santa(event)
 
         assignments = Assignment.query.filter_by(event_id=event.id).all()
-
         for assignment in assignments:
             send_draw_email(
                 user=assignment.giver,
@@ -246,10 +249,9 @@ def draw_event(event_id):
                 assigned_user=assignment.receiver,
             )
 
-        flash(
-            "Secret Santa draw completed successfully! Emails sent 🎄",
-            "success",
-        )
+        event.connected = True
+        db.session.commit()
+        flash("Secret Santa draw completed successfully! Emails sent 🎄", "success")
 
     except Exception as e:
         flash(str(e), "danger")
@@ -272,16 +274,21 @@ def finish_event(event_id):
         flash("Event already finished.", "warning")
         return redirect(url_for("admin.events"))
 
-    event.is_finished = True
-    db.session.commit()
+    try:
+        event.is_finished = True
+        db.session.commit()
 
-    for user in event.participants:
-        send_finish_event_email(user=user, event=event)
+        for user in event.participants:
+            send_finish_event_email(user=user, event=event)
 
-    flash(
-        f"Event '{event.name}' finished. Participants notified by email ✉️",
-        "success",
-    )
+        flash(
+            f"Event '{event.name}' finished. Participants notified by email ✉️",
+            "success",
+        )
+    except Exception as e:
+        flash(f"Error finishing event: {str(e)}", "danger")
+        db.session.rollback()
+
     return redirect(url_for("admin.events"))
 
 

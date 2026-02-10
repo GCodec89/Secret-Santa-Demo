@@ -6,7 +6,6 @@ from flask_mail import Mail
 
 from app.config import Config
 
-
 db = SQLAlchemy()
 login_manager = LoginManager()
 migrate = Migrate()
@@ -19,19 +18,15 @@ def create_default_admin():
 
     try:
         admin_exists = User.query.filter_by(is_admin_flag=True).first()
-
         if not admin_exists:
             admin = User(name="Admin", email="admin@test.com")
             admin.set_password("123456")
             admin.is_admin_flag = True
-
             db.session.add(admin)
             db.session.commit()
-
             print("✅ Default admin created: admin@test.com / 123456")
         else:
             print("ℹ️ Admin already exists")
-
     except OperationalError:
         print("⚠️ Database not ready yet — admin creation skipped")
 
@@ -45,7 +40,6 @@ def create_app():
     login_manager.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
-
     login_manager.login_view = "auth.login"
 
     # ---------- IMPORT MODELS ----------
@@ -64,6 +58,7 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(secret_bp)
 
+    # ---------- CREATE DB + DEFAULT ADMIN ----------
     with app.app_context():
         db.create_all()
         create_default_admin()
