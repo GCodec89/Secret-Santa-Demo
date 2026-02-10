@@ -234,11 +234,12 @@ def draw_event(event_id):
         flash("Not enough participants to perform draw.", "danger")
         return redirect(url_for("admin.events"))
 
-    if not event.connected:
-        flash("Please run connect() first", "warning")
-        return redirect(url_for("admin.events"))
-
     try:
+        if not event.connected:
+            event.connected = True
+            db.session.commit()
+        # -------------------
+
         assign_secret_santa(event)
 
         assignments = Assignment.query.filter_by(event_id=event.id).all()
@@ -249,12 +250,11 @@ def draw_event(event_id):
                 assigned_user=assignment.receiver,
             )
 
-        event.connected = True
-        db.session.commit()
         flash("Secret Santa draw completed successfully! Emails sent 🎄", "success")
 
     except Exception as e:
         flash(str(e), "danger")
+        db.session.rollback()
 
     return redirect(url_for("admin.events"))
 
