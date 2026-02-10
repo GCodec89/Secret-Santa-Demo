@@ -1,34 +1,28 @@
 # Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
 *.py[cod]
-*.pyd
 *.pyo
-*.pyt
-*.pytest_cache/
-
-# Environment / virtualenv
-.venv/
-env/
-ENV/
-venv/
+*.pyd
 *.env
 *.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
-# Flask / instance folder
+# Flask / SQLAlchemy
 instance/
 *.db
-
-# Flask-Migrate / Alembic migrations
 migrations/
+*.sqlite3
 
-# VSCode
+# Editor / IDE
 .vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
 
-# Logs
-*.log
-
-# MacOS
+# OS
 .DS_Store
+Thumbs.db
