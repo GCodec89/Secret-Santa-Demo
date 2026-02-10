@@ -8,10 +8,7 @@ from app.models.user import User
 
 from app.utils import admin_required
 from app.utils.secret_santa import assign_secret_santa
-from app.utils.email_utils import (
-    send_draw_email,
-    send_finish_event_email,
-)
+from app.utils.email_utils import send_draw_email, send_finish_event_email
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -235,22 +232,16 @@ def draw_event(event_id):
         return redirect(url_for("admin.events"))
 
     try:
-        if not event.connected:
-            event.connected = True
-            db.session.commit()
-        # -------------------
-
         assign_secret_santa(event)
-
         assignments = Assignment.query.filter_by(event_id=event.id).all()
         for assignment in assignments:
             send_draw_email(
-                user=assignment.giver,
-                event=event,
-                assigned_user=assignment.receiver,
+                user=assignment.giver, event=event, assigned_user=assignment.receiver
             )
 
-        flash("Secret Santa draw completed successfully! Emails sent 🎄", "success")
+        flash(
+            "Secret Santa draw completed successfully! Emails simulated 🎄", "success"
+        )
 
     except Exception as e:
         flash(str(e), "danger")
@@ -282,9 +273,10 @@ def finish_event(event_id):
             send_finish_event_email(user=user, event=event)
 
         flash(
-            f"Event '{event.name}' finished. Participants notified by email ✉️",
+            f"Event '{event.name}' finished. Participants notified (simulated) ✉️",
             "success",
         )
+
     except Exception as e:
         flash(f"Error finishing event: {str(e)}", "danger")
         db.session.rollback()
@@ -305,9 +297,7 @@ def view_event_results(event_id):
 
     assignments = Assignment.query.filter_by(event_id=event.id).all()
     return render_template(
-        "admin_assignments.html",
-        event=event,
-        assignments=assignments,
+        "admin_assignments.html", event=event, assignments=assignments
     )
 
 
