@@ -1,0 +1,45 @@
+{% extends "base.html" %} {% block content %}
+
+<div class="container mt-4">
+  <h2 class="mb-4">🎛 Admin Dashboard</h2>
+
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100 card-hover text-center">
+        <div class="card-body">
+          <h5 class="card-title">👥 Participants</h5>
+          <p class="card-text">Manage users and participants.</p>
+          <a href="{{ url_for('admin.manage_users') }}" class="btn btn-success"
+            >Manage Users</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100 card-hover text-center">
+        <div class="card-body">
+          <h5 class="card-title">🎄 Create Events</h5>
+          <p class="card-text">Create a new Secret Santa.</p>
+          <a href="{{ url_for('admin.create_event') }}" class="btn btn-primary"
+            >Create Event</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100 card-hover text-center">
+        <div class="card-body">
+          <h5 class="card-title">📊 Events</h5>
+          <p class="card-text">View raffles, poems and other events.</p>
+          <a href="{{ url_for('admin.events') }}" class="btn btn-info"
+            >View Events</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

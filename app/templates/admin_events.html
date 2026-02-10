@@ -1,0 +1,113 @@
+{% extends "base.html" %} {% block title %}Events - Admin{% endblock %} {% block
+content %}
+
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>🎄 Events</h2>
+    <a href="{{ url_for('admin.create_event') }}" class="btn btn-primary"
+      >➕ Create Event</a
+    >
+  </div>
+
+  {% if events %}
+  <table class="table table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Year</th>
+        <th>Participants</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for event in events %}
+      <tr>
+        <td>{{ event.id }}</td>
+        <td>{{ event.name }}</td>
+        <td>{{ event.year }}</td>
+
+        <!-- PARTICIPANTS COUNT -->
+        <td>
+          <span class="badge bg-primary">{{ event.participants|length }}</span>
+        </td>
+
+        <!-- STATUS -->
+        <td>
+          {% if event.is_finished %}
+          <span class="badge bg-success">Finished</span>
+          {% elif event.is_draw_done %}
+          <span class="badge bg-warning text-dark">Drawed</span>
+          {% else %}
+          <span class="badge bg-secondary">Pending</span>
+          {% endif %}
+        </td>
+
+        <!-- ACTIONS -->
+        <td class="d-flex flex-wrap gap-1">
+          {% if not event.is_draw_done %}
+          <a
+            href="{{ url_for('admin.edit_event', event_id=event.id) }}"
+            class="btn btn-sm btn-warning"
+            >Edit</a
+          >
+          {% endif %} {% if not event.is_draw_done %}
+          <form
+            action="{{ url_for('admin.draw_event', event_id=event.id) }}"
+            method="POST"
+          >
+            <button
+              type="submit"
+              class="btn btn-sm btn-primary"
+              onclick="return confirm('Confirm draw?');"
+            >
+              🎲 Draw
+            </button>
+          </form>
+          {% endif %} {% if event.is_draw_done and not event.is_finished %}
+          <form
+            action="{{ url_for('admin.finish_event', event_id=event.id) }}"
+            method="POST"
+          >
+            <button
+              type="submit"
+              class="btn btn-sm btn-warning"
+              onclick="
+                return confirm('Finish the event and begin the poems phase?');
+              "
+            >
+              ✏ Finish
+            </button>
+          </form>
+          {% endif %} {% if event.is_finished %}
+          <a
+            href="{{ url_for('admin.view_event_results', event_id=event.id) }}"
+            class="btn btn-sm btn-info"
+            >👁 View</a
+          >
+          {% endif %}
+
+          <form
+            action="{{ url_for('admin.delete_event', event_id=event.id) }}"
+            method="POST"
+          >
+            <button
+              type="submit"
+              class="btn btn-sm btn-danger"
+              onclick="return confirm('Eliminate this event?');"
+            >
+              🗑 Delete
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="alert alert-info">There are no events yet.</div>
+  {% endif %}
+</div>
+
+{% endblock %}

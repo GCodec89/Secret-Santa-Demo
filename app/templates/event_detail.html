@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+  <head>
+    <title>{{ event.name }} - Secret Santa</title>
+  </head>
+  <body>
+    <h1>{{ event.name }} ({{ event.year }})</h1>
+
+    <h2>Participants</h2>
+    <ul>
+      {% for user in event.participants %}
+      <li>{{ user.email }}</li>
+      {% endfor %}
+    </ul>
+
+    <h2>Assignments</h2>
+    <ul>
+      {% for assignment in assignments %}
+      <li>{{ assignment.giver.email }} → {{ assignment.receiver.email }}</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

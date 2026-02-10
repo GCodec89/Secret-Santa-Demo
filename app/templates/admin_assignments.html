@@ -1,0 +1,46 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-4">
+  <h2>Assignments - {{ event.name }} ({{ event.year }})</h2>
+
+  {% if assignments %}
+  <form
+    method="POST"
+    action="{{ url_for('admin.save_poems', event_id=event.id) }}"
+  >
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Giver</th>
+          <th>Receiver</th>
+          <th>Poem</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for assignment in assignments %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ assignment.giver.name }}</td>
+          <td>{{ assignment.receiver.name }}</td>
+          <td>
+            <textarea
+              name="poem_{{ assignment.id }}"
+              class="form-control"
+              rows="2"
+            >
+{{ assignment.poem or '' }}</textarea
+            >
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-success">Save Poems</button>
+    <a href="{{ url_for('admin.events') }}" class="btn btn-secondary">Back</a>
+  </form>
+  {% else %}
+  <p>No assignments yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
