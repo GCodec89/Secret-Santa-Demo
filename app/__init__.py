@@ -29,7 +29,6 @@ def create_default_admin():
             db.session.commit()
 
             print("✅ Default admin created: admin@test.com / 123456")
-
         else:
             print("ℹ️ Admin already exists")
 
@@ -38,7 +37,6 @@ def create_default_admin():
 
 
 def create_app():
-
     app = Flask(__name__)
     app.config.from_object(Config)
 
@@ -66,8 +64,8 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(secret_bp)
 
-    # ---------- CREATE DEFAULT ADMIN ----------
     with app.app_context():
+        db.create_all()
         create_default_admin()
 
     return app
