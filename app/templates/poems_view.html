@@ -1,79 +1,38 @@
 {% extends "base.html" %} {% block content %}
 <div class="container mt-4">
-  <h2>
-    🎭 {{ event.name }} ({{ event.year }}) {% if current_user.is_admin_flag %} —
-    Admin View {% else %} — Event Finished {% endif %}
-  </h2>
+  <h2>{{ event.name }} ({{ event.year }})</h2>
+  <hr />
 
-  {% if assignments %}
   <form
     method="POST"
-    action="{% if current_user.is_admin_flag %}{{ url_for('admin.save_poems', event_id=event.id) }}{% else %}{{ url_for('secret.save_my_poem', event_id=event.id) }}{% endif %}"
+    action="{% if current_user.is_admin_flag %}
+                     {{ url_for('admin.view_event', event_id=event.id) }}
+                  {% else %}
+                     {{ url_for('secret.view_event', event_id=event.id) }}
+                  {% endif %}"
   >
-    <table class="table table-striped mt-3">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Giver</th>
-          <th>Receiver</th>
-          <th>Poem</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for assignment in assignments %}
-        <tr>
-          <td>{{ loop.index }}</td>
-          <td>{{ assignment.giver.name }}</td>
-          <td>{{ assignment.receiver.name }}</td>
-          <td>
-            {% if current_user.is_admin_flag %}
-            <!-- Admin can edit all -->
-            <textarea
-              name="poem_{{ assignment.id }}"
-              class="form-control"
-              rows="2"
-            >
-{{ assignment.poem or '' }}</textarea
-            >
-            {% elif assignment.giver_id == current_user.id %}
-            <!-- User can edit own poem -->
-            <textarea
-              name="poem_{{ assignment.id }}"
-              class="form-control"
-              rows="2"
-              placeholder="Write here your poem..."
-            >
-{{ assignment.poem or '' }}</textarea
-            >
-            {% else %}
-            <!-- Other poems read-only -->
-            {% if assignment.poem %}
-            <span class="text-success">{{ assignment.poem }}</span>
-            {% else %}
-            <span class="text-muted fst-italic">Still not sent</span>
-            {% endif %} {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    {% for assignment in assignments %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5>{{ assignment.giver.name }} → {{ assignment.receiver.name }}</h5>
 
-    <button
-      type="submit"
-      class="btn {% if current_user.is_admin_flag %}btn-success{% else %}btn-primary{% endif %}"
-    >
-      {% if current_user.is_admin_flag %}Save Poems{% else %}💾 Save my poem{%
-      endif %}
-    </button>
-    <a
-      href="{% if current_user.is_admin_flag %}{{ url_for('admin.events') }}{% else %}{{ url_for('main.dashboard') }}{% endif %}"
-      class="btn btn-secondary ms-2"
-    >
-      ⬅ Back
-    </a>
+        {% if current_user.is_admin_flag or assignment.giver_id ==
+        current_user.id %}
+        <textarea
+          class="form-control mt-2"
+          name="poem_{{ assignment.id }}"
+          rows="3"
+        >
+{{ assignment.poem or "" }}</textarea
+        >
+        {% else %}
+        <p class="mt-2">{{ assignment.poem or "No poem yet." }}</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">Save Poems</button>
   </form>
-  {% else %}
-  <p>No assignments yet.</p>
-  {% endif %}
 </div>
 {% endblock %}
