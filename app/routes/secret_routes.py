@@ -38,11 +38,10 @@ def my_secret(event_id):
     return render_template("my_secret_santa.html", receiver=assignment.receiver)
 
 
-# ---------- VIEW FINISHED EVENT ----------
-@secret_bp.route("/event/<int:event_id>/view")
+# ---------- VIEW FINISHED EVENT + EDIT MY POEM ----------
+@secret_bp.route("/event/<int:event_id>/view", methods=["GET", "POST"])
 @login_required
-def view_finished_event(event_id):
-
+def view_event(event_id):
     event = Event.query.get_or_404(event_id)
 
     if not event.is_finished:
@@ -55,29 +54,13 @@ def view_finished_event(event_id):
 
     assignments = Assignment.query.filter_by(event_id=event.id).all()
 
-    return render_template("user_event_view.html", event=event, assignments=assignments)
+    if request.method == "POST":
+        for assignment in assignments:
+            if assignment.giver_id == current_user.id:
+                poem_text = request.form.get(f"poem_{assignment.id}")
+                assignment.poem = poem_text.strip() if poem_text else None
+        db.session.commit()
+        flash("Your poem has been saved!", "success")
+        return redirect(url_for("secret.view_event", event_id=event.id))
 
-
-# ---------- SAVE USER POEM ----------
-@secret_bp.route("/event/<int:event_id>/save-poem", methods=["POST"])
-@login_required
-def save_my_poem(event_id):
-
-    event = Event.query.get_or_404(event_id)
-
-    assignment = Assignment.query.filter_by(
-        event_id=event.id, giver_id=current_user.id
-    ).first()
-
-    if not assignment:
-        flash("You don't have permission to edit this poem.", "danger")
-        return redirect(url_for("main.dashboard"))
-
-    poem_text = request.form.get(f"poem_{assignment.id}")
-
-    assignment.poem = poem_text.strip() if poem_text else None
-    db.session.commit()
-
-    flash("Poem successfully saved!", "success")
-
-    return redirect(url_for("secret.view_finished_event", event_id=event.id))
+    return render_template("poems_view.html", event=event, assignments=assignments)
