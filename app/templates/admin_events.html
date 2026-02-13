@@ -13,20 +13,17 @@ content %}
   </div>
 
   <!-- HEADER -->
-  <div
-    class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2"
-  >
+  <div class="mb-4">
     <h2 class="mb-0">🎄 Events</h2>
-    <a href="{{ url_for('admin.create_event') }}" class="btn btn-primary">
-      ➕ Create Event
-    </a>
   </div>
 
   {% if events %}
 
-  <!-- RESPONSIVE TABLE WRAPPER -->
-  <div class="table-responsive">
-    <table class="table table-hover align-middle text-nowrap">
+  <!-- ========================= -->
+  <!-- DESKTOP TABLE (md and up) -->
+  <!-- ========================= -->
+  <div class="table-responsive d-none d-md-block">
+    <table class="table table-hover align-middle">
       <thead class="table-dark">
         <tr>
           <th>ID</th>
@@ -45,14 +42,12 @@ content %}
           <td class="fw-semibold">{{ event.name }}</td>
           <td>{{ event.year }}</td>
 
-          <!-- PARTICIPANTS -->
           <td>
             <span class="badge bg-primary">
               {{ event.participants|length }}
             </span>
           </td>
 
-          <!-- STATUS -->
           <td>
             {% if event.is_finished %}
             <span class="badge bg-success">Finished</span>
@@ -63,71 +58,51 @@ content %}
             {% endif %}
           </td>
 
-          <!-- ACTIONS -->
           <td>
             <div class="d-flex flex-wrap gap-1">
-              {% if not event.is_draw_done %}
-              <a
-                href="{{ url_for('admin.edit_event', event_id=event.id) }}"
-                class="btn btn-sm btn-outline-warning"
-              >
-                Edit
-              </a>
-              {% endif %} {% if not event.is_draw_done %}
-              <form
-                action="{{ url_for('admin.draw_event', event_id=event.id) }}"
-                method="POST"
-              >
-                <button
-                  type="submit"
-                  class="btn btn-sm btn-primary"
-                  onclick="return confirm('Confirm draw?');"
-                >
-                  🎲 Draw
-                </button>
-              </form>
-              {% endif %} {% if event.is_draw_done and not event.is_finished %}
-              <form
-                action="{{ url_for('admin.finish_event', event_id=event.id) }}"
-                method="POST"
-              >
-                <button
-                  type="submit"
-                  class="btn btn-sm btn-outline-warning"
-                  onclick="
-                    return confirm('Finish event and start poem phase?');
-                  "
-                >
-                  ✏ Finish
-                </button>
-              </form>
-              {% endif %} {% if event.is_finished %}
-              <a
-                href="{{ url_for('admin.view_event_results', event_id=event.id) }}"
-                class="btn btn-sm btn-info text-white"
-              >
-                👁 View
-              </a>
-              {% endif %}
-
-              <form
-                action="{{ url_for('admin.delete_event', event_id=event.id) }}"
-                method="POST"
-              >
-                <button
-                  type="submit"
-                  class="btn btn-sm btn-outline-danger"
-                  onclick="return confirm('Delete this event?');"
-                >
-                  🗑
-                </button>
-              </form>
+              {% include "admin/_event_actions.html" %}
             </div>
           </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+  </div>
+
+  <!-- ========================= -->
+  <!-- MOBILE CARDS (below md) -->
+  <!-- ========================= -->
+  <div class="d-md-none">
+    {% for event in events %}
+    <div class="card mb-3 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="card-title mb-0 fw-bold">{{ event.name }}</h5>
+
+          {% if event.is_finished %}
+          <span class="badge bg-success">Finished</span>
+          {% elif event.is_draw_done %}
+          <span class="badge bg-warning text-dark">Draw done</span>
+          {% else %}
+          <span class="badge bg-secondary">Pending</span>
+          {% endif %}
+        </div>
+
+        <p class="mb-1"><strong>Year:</strong> {{ event.year }}</p>
+
+        <p class="mb-3">
+          <strong>Participants:</strong>
+          <span class="badge bg-primary">
+            {{ event.participants|length }}
+          </span>
+        </p>
+
+        <div class="d-flex flex-wrap gap-2">
+          {% include "admin/_event_actions.html" %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
   </div>
 
   {% else %}

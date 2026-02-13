@@ -1,0 +1,54 @@
+{% if not event.is_draw_done %}
+<a
+  href="{{ url_for('admin.edit_event', event_id=event.id) }}"
+  class="btn btn-sm btn-outline-warning"
+>
+  Edit
+</a>
+{% endif %} {% if not event.is_draw_done %}
+<form
+  action="{{ url_for('admin.draw_event', event_id=event.id) }}"
+  method="POST"
+>
+  <button
+    type="submit"
+    class="btn btn-sm btn-primary"
+    onclick="return confirm('Confirm draw?');"
+  >
+    🎲 Draw
+  </button>
+</form>
+{% endif %} {% if event.is_draw_done and not event.is_finished %}
+<form
+  action="{{ url_for('admin.finish_event', event_id=event.id) }}"
+  method="POST"
+>
+  <button
+    type="submit"
+    class="btn btn-sm btn-outline-warning"
+    onclick="return confirm('Finish event and start poem phase?');"
+  >
+    ✏ Finish
+  </button>
+</form>
+{% endif %} {% if event.is_finished %}
+<a
+  href="{{ url_for('admin.view_event_results', event_id=event.id) }}"
+  class="btn btn-sm btn-info text-white"
+>
+  👁 View
+</a>
+{% endif %}
+
+<form
+  action="{{ url_for('admin.delete_event', event_id=event.id) }}"
+  method="POST"
+>
+  <button
+    type="submit"
+    class="btn btn-sm btn-outline-danger"
+    onclick="return confirm('Delete this event?');"
+  >
+    🗑
+  </button>
+</form>
