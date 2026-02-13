@@ -1,84 +1,97 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} {% block title %}Manage Participants{% endblock %} {%
+block content %}
 
-<h2>Manage Participants</h2>
-
-<!-- Add participant form -->
-<form method="POST" class="mb-4">
+<div class="container mt-4">
+  <!-- BACK BUTTON -->
   <div class="mb-3">
-    <label>Name</label>
-    <input type="text" name="name" class="form-control" required />
+    <a
+      href="{{ url_for('admin.dashboard') }}"
+      class="btn btn-outline-secondary btn-sm"
+    >
+      ← Back to Dashboard
+    </a>
   </div>
 
-  <div class="mb-3">
-    <label>Email</label>
-    <input type="email" name="email" class="form-control" required />
-  </div>
+  <h2 class="mb-4">Manage Participants</h2>
 
-  <div class="mb-3">
-    <label>Password</label>
-
-    <div class="input-group">
-      <input
-        type="text"
-        name="password"
-        id="password"
-        class="form-control"
-        required
-      />
-
-      <button
-        type="button"
-        class="btn btn-outline-secondary"
-        onclick="generatePassword()"
-      >
-        Generate
-      </button>
+  <!-- Add participant form -->
+  <form method="POST" class="mb-4">
+    <div class="mb-3">
+      <label class="form-label">Name</label>
+      <input type="text" name="name" class="form-control" required />
     </div>
-  </div>
 
-  <button type="submit" class="btn btn-success">Add Participant</button>
-</form>
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input type="email" name="email" class="form-control" required />
+    </div>
 
-<hr />
+    <div class="mb-3">
+      <label class="form-label">Password</label>
 
-<h4>Current Participants</h4>
+      <div class="input-group">
+        <input
+          type="text"
+          name="password"
+          id="password"
+          class="form-control"
+          required
+        />
 
-<ul class="list-group mt-3">
-  {% for user in users %}
-
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    {{ user.name }} ({{ user.email }})
-
-    <span>
-      <a
-        href="{{ url_for('admin.edit_user', user_id=user.id) }}"
-        class="btn btn-sm btn-primary"
-      >
-        Edit
-      </a>
-
-      <form
-        method="POST"
-        action="{{ url_for('admin.delete_user', user_id=user.id) }}"
-        style="display: inline-block"
-      >
         <button
-          type="submit"
-          class="btn btn-sm btn-danger"
-          onclick="return confirm('Delete this participant?');"
+          type="button"
+          class="btn btn-outline-secondary"
+          onclick="generatePassword()"
         >
-          Delete
+          Generate
         </button>
-      </form>
-    </span>
-  </li>
+      </div>
+    </div>
 
-  {% endfor %}
-</ul>
+    <button type="submit" class="btn btn-success">Add Participant</button>
+  </form>
 
-<a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary mt-3">
-  Back
-</a>
+  <hr class="my-4" />
+
+  <h4>Current Participants</h4>
+
+  <ul class="list-group mt-3">
+    {% for user in users %}
+
+    <li
+      class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2"
+    >
+      <div>
+        <strong>{{ user.name }}</strong><br />
+        <small class="text-muted">{{ user.email }}</small>
+      </div>
+
+      <div class="d-flex gap-2">
+        <a
+          href="{{ url_for('admin.edit_user', user_id=user.id) }}"
+          class="btn btn-sm btn-outline-primary"
+        >
+          Edit
+        </a>
+
+        <form
+          method="POST"
+          action="{{ url_for('admin.delete_user', user_id=user.id) }}"
+        >
+          <button
+            type="submit"
+            class="btn btn-sm btn-outline-danger"
+            onclick="return confirm('Delete this participant?');"
+          >
+            Delete
+          </button>
+        </form>
+      </div>
+    </li>
+
+    {% endfor %}
+  </ul>
+</div>
 
 <!-- PASSWORD GENERATOR SCRIPT -->
 <script>
@@ -90,21 +103,14 @@
 
     let password = "";
 
-    // 8 numbers
     for (let i = 0; i < 8; i++) {
       password += numbers.charAt(Math.floor(Math.random() * numbers.length));
     }
 
-    // 1 lowercase
     password += lowercase.charAt(Math.floor(Math.random() * lowercase.length));
-
-    // 1 uppercase
     password += uppercase.charAt(Math.floor(Math.random() * uppercase.length));
-
-    // 1 special char
     password += special.charAt(Math.floor(Math.random() * special.length));
 
-    // Shuffle result
     password = password
       .split("")
       .sort(() => 0.5 - Math.random())
