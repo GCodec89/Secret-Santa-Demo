@@ -58,9 +58,8 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(secret_bp)
 
-    # ---------- CREATE DB + DEFAULT ADMIN ----------
+    # ---------- ONLY CREATE DEFAULT ADMIN ----------
     with app.app_context():
-        db.create_all()
         create_default_admin()
 
     return app
