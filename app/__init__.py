@@ -10,7 +10,7 @@ login_manager = LoginManager()
 mail = Mail()
 
 
-# ------------------- FUNÇÃO ADMIN -------------------
+# ------------------- ADMIN -------------------
 def create_default_admin():
     from app.models.user import User
     from sqlalchemy.exc import OperationalError
@@ -34,11 +34,15 @@ def create_default_admin():
 def create_app():
     app = Flask(__name__)
     app.config.update(
-        SECRET_KEY=os.environ.get("SECRET_KEY", "dev"),
+        SECRET_KEY=os.environ.get("SECRET_KEY", "dev-secret-key"),
         SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL", "sqlite:///app.db"),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        MAIL_SERVER="localhost",  # ajusta conforme precisas
-        MAIL_PORT=25,
+        MAIL_SERVER=os.environ.get("MAIL_SERVER", "localhost"),
+        MAIL_PORT=int(os.environ.get("MAIL_PORT", 25)),
+        MAIL_USE_TLS=True,
+        MAIL_USERNAME=os.environ.get("MAIL_USERNAME"),
+        MAIL_PASSWORD=os.environ.get("MAIL_PASSWORD"),
+        MAIL_DEFAULT_SENDER=os.environ.get("MAIL_DEFAULT_SENDER"),
     )
 
     # ---------- INIT EXTENSIONS ----------
@@ -63,9 +67,9 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(secret_bp)
 
-    # ---------- CRIA TABELAS SE NÃO EXISTIREM ----------
+    # ---------- CREATE DATABASE & ADMIN ----------
     with app.app_context():
-        db.create_all()  # cria todas as tabelas
-        create_default_admin()  # cria admin padrão
+        db.create_all()
+        create_default_admin()
 
     return app
