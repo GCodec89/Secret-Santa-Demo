@@ -46,7 +46,7 @@ endblock %} {% block content %}
           <div class="mt-auto">
             {% if event.is_finished %}
             <a
-              href="{{ url_for('secret.view_finished_event', event_id=event.id) }}"
+              href="{{ url_for('secret.view_event', event_id=event.id) }}"
               class="btn btn-secondary w-100"
             >
               🎭 View Event

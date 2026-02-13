@@ -33,7 +33,7 @@
 </form>
 {% endif %} {% if event.is_finished %}
 <a
-  href="{{ url_for('admin.view_event_results', event_id=event.id) }}"
+  href="{{ url_for('admin.view_event', event_id=event.id) }}"
   class="btn btn-sm btn-info text-white"
 >
   👁 View
