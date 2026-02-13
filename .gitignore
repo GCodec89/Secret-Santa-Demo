@@ -16,6 +16,9 @@ instance/
 *.db
 *.sqlite3
 
+# Alembic / Migrations
+migrations/
+
 # Editor / IDE
 .vscode/
 .idea/

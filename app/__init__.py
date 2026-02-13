@@ -1,17 +1,16 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from flask_migrate import Migrate
 from flask_mail import Mail
+import os
 
-from app.config import Config
-
+# ------------------- EXTENSIONS -------------------
 db = SQLAlchemy()
 login_manager = LoginManager()
-migrate = Migrate()
 mail = Mail()
 
 
+# ------------------- FUNÇÃO ADMIN -------------------
 def create_default_admin():
     from app.models.user import User
     from sqlalchemy.exc import OperationalError
@@ -31,14 +30,20 @@ def create_default_admin():
         print("⚠️ Database not ready yet — admin creation skipped")
 
 
+# ------------------- FACTORY -------------------
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.update(
+        SECRET_KEY=os.environ.get("SECRET_KEY", "dev"),
+        SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL", "sqlite:///app.db"),
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
+        MAIL_SERVER="localhost",  # ajusta conforme precisas
+        MAIL_PORT=25,
+    )
 
     # ---------- INIT EXTENSIONS ----------
     db.init_app(app)
     login_manager.init_app(app)
-    migrate.init_app(app, db)
     mail.init_app(app)
     login_manager.login_view = "auth.login"
 
@@ -58,8 +63,9 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(secret_bp)
 
-    # ---------- ONLY CREATE DEFAULT ADMIN ----------
+    # ---------- CRIA TABELAS SE NÃO EXISTIREM ----------
     with app.app_context():
-        create_default_admin()
+        db.create_all()  # cria todas as tabelas
+        create_default_admin()  # cria admin padrão
 
     return app
